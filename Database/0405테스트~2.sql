@@ -1,0 +1,56 @@
+SELECT *  
+FROM SCORES
+WHERE SCORE > 77.7 AND SCORE < 80
+;
+
+SELECT *
+FROM SCORES
+WHERE SCORE < 60 OR SCORE > 90;
+
+--낙제는 60점 미만
+--1등급은 90점 이상
+--2등급은 80점 이상 90점 미만
+--3등급은 70점이상 80점미만
+--4등급은 60점이상 70점미만
+
+--1등급과 4등급의 데이터를 뽑자 --> 정보
+SELECT *
+FROM SCORES
+WHERE SCORE >= 90 OR (SCORE < 80 AND SCORE >= 70 )
+ORDER BY SCORE DESC;
+
+--영어인거 찾자
+--영어인거중에 2등급
+SELECT *
+FROM SCORES
+WHERE SUBJECT_NAME = '영어' AND (SCORE >= 80 AND SCORE < 90);
+
+SELECT *
+FROM SCORES
+WHERE (SUBJECT_NAME = '영어' AND (SCORE >= 80 AND SCORE < 90)) OR (SCORE >= 90 AND SUBJECT_NAME = '수학'); 
+
+--IN 연산자
+SELECT *
+FROM SCORES
+WHERE SUBJECT_NAME IN ('국어','영어', '수학');
+
+-- 영어, 수학 과목의 2등급
+
+SELECT *
+FROM SCORES
+WHERE SUBJECT_NAME IN('영어','수학') AND (SCORE < 90 AND SCORE >= 80);
+
+SELECT * FROM STUDENTS;
+
+--학생이름중에 성이 홍씨인 데이터를 찾자
+
+SELECT * FROM STUDENTS
+WHERE AGE LIKE '%%';
+
+--오라클에서의 문자연결자
+SELECT * FROM STUDENTS
+WHERE SNAME = :AAA;
+
+SELECT * FROM STUDENTS
+WHERE SNAME LIKE '%' || :AAA || '%'
+;
