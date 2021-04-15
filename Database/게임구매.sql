@@ -126,7 +126,7 @@ CREATE TABLE G_STORE
     GID CHAR(4) NOT NULL,
     MID CHAR(4) NOT NULL,
     BUY_NUM NUMBER(2) NOT NULL,
-    BUY_DATE VARCHAR(60) NOT NULL
+    BUY_DATE DATE NOT NULL
 );
 
 INSERT INTO G_STORE VALUES('G001','M001',1,'2021-04-07');
@@ -281,27 +281,7 @@ SELECT * FROM G_STORE;
 ------------------------------------------------1일차
 
 --1.부산에서 게임을 구매한 사람중 남자의 총 매출
-    SELECT SUM(T3.GPRICE * T1.BUY_NUM)
-    FROM G_STORE T1, G_MEMBERS T2, G_GAMES T3, G_REGION T4
-    WHERE T1.MID = T2.MID
-    AND T1.GID = T3.GID
-    AND T2.MADDR = T4.RGID
-    AND T2.MGENDER = 'M'
-    AND T4.RGNAME = '부산'
-    ;
-    
-    SELECT *
-    FROM G_STORE T1, G_MEMBERS T2, G_GAMES T3
-    WHERE T1.MID(+) = T2.MID
-    AND T1.GID(+) = T3.GID
-    AND T1.MID IS NULL
-    AND T3.GNAME LIKE '디아블로%'
-    ;
-    
-    SELECT *
-    FROM G_STORE T1, G_MEMBERS T2
-    WHERE T1.MID(+) = T2.MID
-    ;
+
 --2.스타크래프트를 구매한 사람을 지역별로 표시하시오 결과 지역 : 몇명
 
 --3.서울에서 구매한 게임의 종류를 표시하시오 결과는 서울 : 게임이름
@@ -326,71 +306,15 @@ SELECT * FROM G_STORE;
 SELECT * FROM G_GENRE;
 
 --9.모든 디아블로를 구매한 사람중 가장 구매비용이 높은 사람은?
-
-    SELECT MNAME, PRICE || '원' FROM
-    (
-        SELECT T2.MNAME, GPRICE * BUY_NUM AS PRICE, RANK() OVER(ORDER BY GPRICE * BUY_NUM DESC) AS RNKNUM
-        FROM G_GAMES T1, G_MEMBERS T2, G_STORE T3
-        WHERE T1.GID = T3.GID
-        AND T2.MID = T3.MID
-        AND GNAME LIKE '디아블로%'
-    )
-    WHERE RNKNUM = 1
-    ;
     
 --10.롤플레잉 장르의 총 매출평균보다  총 매출평균이 높은 장르는?
 
-    SELECT GENAME, TRIM(TO_CHAR(AVGPRICE,'999999')) || '원' AS COST FROM
-    (
-    SELECT T3.GENAME, AVG(T1.GPRICE * T2.BUY_NUM) AS AVGPRICE
-    FROM G_GAMES T1, G_STORE T2, G_GENRE T3
-    WHERE T1.GID = T2.GID
-    AND T1.GEID = T3.GEID
-    AND T3.GENAME != '롤플레잉'
-    GROUP BY T3.GENAME
-    )
-    WHERE AVGPRICE > 
-    (
-    SELECT AVG(T1.GPRICE * T2.BUY_NUM)
-    FROM G_GAMES T1, G_STORE T2, G_GENRE T3
-    WHERE T1.GID = T2.GID
-    AND T1.GEID = T3.GEID
-    AND GENAME = '롤플레잉'
-    )
-    ;
-
 --11.4월 한달간 몇월 몇일에 게임구매가 이루어졌는지 나타내시오
 --예) 4월 1일 0개
-
-    SELECT ADATE, NVL(SUMNUM, 0) || '개'AS NUM
-    FROM
-    (
-        SELECT TO_CHAR(TO_DATE('2021-04-01') + (LEVEL-1),'YYYY-MM-DD') AS ADATE
-        FROM DUAL
-        CONNECT BY LEVEL <= 30
-    ) T1,
-    (
-        SELECT BUY_DATE,SUM(BUY_NUM) AS SUMNUM
-        FROM G_STORE
-        GROUP BY BUY_DATE
-    ) T2
-    WHERE  T1.ADATE = T2.BUY_DATE(+)
-    ORDER BY T1.ADATE
-    ;
     
 --12.4월 8일에 팔린 게임을 남녀 구분해서 몇개 구매되었는지 나타내시오
 --예) 남성 0개
 --   여성 0개
 
-    SELECT DECODE(T1.MGENDER,'M','남성','F','여성')AS GENDER, COUNT(*)  || '개' AS NUM
-    FROM G_MEMBERS T1, G_STORE T2
-    WHERE T1.MID = T2.MID
-    AND T2.BUY_DATE = '2021-04-08'
-    GROUP BY T1.MGENDER
-    ;
-
 --13. 4월 8일 부터 14일중 모든 오버워치의 총매출 보다 총매출이 높은 게임중 총 매출이 가장 낮은 게임과 게임이 팔린 날짜를 나타내시오 
 --창목전용 문제 파이팅!
-
-    SELECT *
-    FROM GAMES T1, G_STORE T2
