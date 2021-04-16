@@ -318,3 +318,26 @@ SELECT * FROM G_GENRE;
 
 --13. 4월 8일 부터 14일중 모든 오버워치의 총매출 보다 총매출이 높은 게임중 총 매출이 가장 낮은 게임과 게임이 팔린 날짜를 나타내시오 
 --창목전용 문제 파이팅!
+
+ SELECT GNAME, GAMASPRICE, BUY_DATE
+    FROM (
+        SELECT GNAME, GAMASPRICE, BUY_DATE, RANK() OVER(ORDER BY GAMASPRICE ASC) AS RNK 
+        FROM
+        (
+            SELECT T1.GNAME ,SUM(T1.GPRICE * T2.BUY_NUM) AS GAMASPRICE, T2.BUY_DATE
+            FROM G_GAMES T1, G_STORE T2
+            WHERE T1.GID = T2.GID
+            AND (TO_NUMBER(TO_CHAR(T2.BUY_DATE, 'MM')) = 4 AND TO_NUMBER(TO_CHAR(T2.BUY_DATE, 'DD')) >= 8 AND TO_NUMBER(TO_CHAR(T2.BUY_DATE, 'DD')) <= 14) 
+            GROUP BY T1.GNAME,  T2.BUY_DATE
+        )
+        WHERE GAMASPRICE >  
+        (
+            SELECT SUM(T1.GPRICE * T2.BUY_NUM)
+            FROM G_GAMES T1, G_STORE T2
+            WHERE T1.GID = T2.GID
+            AND T1.GNAME LIKE '오버워치%'
+            AND (TO_NUMBER(TO_CHAR(T2.BUY_DATE, 'MM')) = 4 AND TO_NUMBER(TO_CHAR(T2.BUY_DATE, 'DD')) >= 8 AND TO_NUMBER(TO_CHAR(T2.BUY_DATE, 'DD')) <= 14) 
+        )
+    )
+    WHERE RNK = 1
+    ;
