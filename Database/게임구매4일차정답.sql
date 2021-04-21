@@ -331,23 +331,121 @@ SELECT * FROM G_GENRE;
 --14.2021년 4월 11일에 구매된 게임이름과 금액을 구하고 표시하시오 
 --표시예) 게임이름 | 금액(금액 세번째 자리마다 , 가 붙도록) | 구매일자(2021년 4월 11일)<-이렇게
 
+    SELECT T2.GNAME, TO_CHAR(T2.GPRICE * T1.BUY_NUM, '999,999,999') AS PRICE,  
+            (TO_CHAR(T1.BUY_DATE,'YYYY') || '년' || TO_CHAR(T1.BUY_DATE,'FMMM') || '월' || TO_CHAR(T1.BUY_DATE,'FMDD') || '일') AS INDATE
+    FROM G_STORE T1, G_GAMES T2
+    WHERE T1.GID = T2.GID
+    AND T1.BUY_DATE = '20210411'
+    ;
 
 --15.2021년중 수요일에 구매된 게임이름과 금액을 표시하시오
 
+    SELECT T1.GNAME, T1.GPRICE * T2.BUY_NUM
+    FROM G_GAMES T1, G_STORE T2
+    WHERE T1.GID = T2.GID
+    AND TO_CHAR(T2.BUY_DATE, 'D') = '4'
+    ;
 
 --16.달을 기준으로 판매된 게임의 개수를 구하고 그 게임의 이름을 표시하시오
 --표시예) 2021-01 | 게임명: 게임이름  | 게임개수(게임명의 판매된횟수(ROW)를 이야기하고있습니다)개 
 
+    SELECT T1.OUTDATE, '게임명:' || T2.GNAME, T2.GCOUNT || '개'
+    FROM
+    (
+        SELECT TO_CHAR(TRUNC(SYSDATE, 'YEAR') + (LEVEL-1),'YYYY-MM') AS OUTDATE
+        FROM DUAL
+        CONNECT BY LEVEL <= 365
+        GROUP BY TO_CHAR(TRUNC(SYSDATE, 'YEAR') + (LEVEL-1),'YYYY-MM')
+    ) T1,
+    (
+        SELECT T2.GNAME,TO_CHAR(T1.BUY_DATE,'YYYY-MM') AS INDATE, COUNT(*) AS GCOUNT
+        FROM G_STORE T1, G_GAMES T2
+        WHERE T1.GID = T2.GID
+        GROUP BY T2.GNAME,TO_CHAR(T1.BUY_DATE,'YYYY-MM')
+    ) T2
+    WHERE T1.OUTDATE = T2.INDATE(+)
+    ;
+
 
 --17.판매된 게임의 시리즈중 2탄인 게임을(Ⅱ제외) 구매한 사람과 금액을 표시하시오
 --SUBSTR 사용금지
---LIKE 금지
 
+    SELECT T3.MNAME, SUM(T1.GPRICE * T2.BUY_NUM)
+    FROM G_GAMES T1, G_STORE T2, G_MEMBERS T3
+    WHERE T1.GID = T2.GID
+    AND T3.MID = T2.MID
+    AND INSTR(T1.GNAME,'2') > 0 AND T1.GID != 'G034'
+    GROUP BY T3.MNAME
+    ;
 
 --18.이 게임가게의 포인트제도는 2021년 6월부터 시작했는데 6월이후 게임을 구매한 사람들의 포인트를 G_MEMBERS_POINT에 INSERT하는 프로시저를 만들어보자
 --포인트는 게임구매가격의 5%로 통일한다
 
-
+    CREATE OR REPLACE PROCEDURE PROC_INSERT_POINT
+    AS
+    BEGIN
+    
+        INSERT INTO G_MEMBERS_POINT
+        (MID, G_POINT)
+        SELECT T3.MID, SUM(T2.GPRICE * T1.BUY_NUM * 0.05 )
+        FROM G_STORE T1, G_GAMES T2, G_MEMBERS T3
+        WHERE T1.GID = T2.GID
+        AND T1.MID = T3.MID
+        AND BUY_DATE >= '20210601'
+        GROUP BY T3.MID
+        ORDER BY T3.MID
+        ;
+        
+    END PROC_INSERT_POINT
+    ;
+    
 --19. 고객 M009는 포인트로만 G037과 G035를 한개씩 구매하려 한다(첫번째는 G037 두번째는 G035)
 -- 포인트를 업데이트하고 구매를 인설트하는 프로시저를 만들어보자(18번을 풀지않았다면 먼저 풀자)
 -- 포인트가 부족하면 '포인트가 부족하여 구매할 수 없습니다'라는 문구를 띄워보자
+
+    CREATE OR REPLACE PROCEDURE PROC_UPDATE_POINT
+    (
+        IN_GID      IN      VARCHAR2,
+        IN_MID      IN      VARCHAR2,
+        IN_BUY_NUM  IN      VARCHAR2,
+        O_MSG       OUT     VARCHAR2
+    )
+    AS
+    
+        V_M_POINT       NUMBER(10);
+        V_G_PRICE       NUMBER(10);
+        
+    BEGIN
+        SELECT G_POINT
+        INTO V_M_POINT
+        FROM G_MEMBERS_POINT
+        WHERE MID = IN_MID
+        ;
+        
+        SELECT GPRICE
+        INTO V_G_PRICE
+        FROM G_GAMES
+        WHERE GID = IN_GID
+        ;
+        
+        IF V_M_POINT > V_G_PRICE THEN
+        
+            INSERT INTO G_STORE
+            (GID, MID, BUY_NUM, BUY_DATE)
+            VALUES
+            (IN_GID, IN_MID, IN_BUY_NUM, SYSDATE)
+            ;
+            
+            UPDATE G_MEMBERS_POINT
+            SET G_POINT = G_POINT - V_G_PRICE
+            WHERE MID = IN_MID
+            ;
+            
+        ELSE
+        
+            O_MSG := '포인트가 부족하여 구매할 수 없습니다';
+        
+        END IF;
+    
+    END PROC_UPDATE_POINT
+    ;
