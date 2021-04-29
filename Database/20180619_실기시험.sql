@@ -1,0 +1,156 @@
+-- 업무정의
+-- 간단한 커뮤너티
+
+-- 0. 데이터베이스 만들기
+CREATE DATABASE COMMUNITIES;
+
+-- 1. 회원
+CREATE TABLE MEMBERS_TBL
+(
+	MEM_ID	CHAR(6)	PRIMARY KEY,
+    MEM_NAME	VARCHAR(10)	NOT NULL,
+    MEM_PWD		VARCHAR(20) NOT NULL,
+    USE_YN		CHAR(1)		NOT NULL
+);
+
+INSERT INTO MEMBERS_TBL VALUES('MEM001', '회원1', '1111', 'Y');
+INSERT INTO MEMBERS_TBL VALUES('MEM002', '회원2', '2222', 'Y');
+INSERT INTO MEMBERS_TBL VALUES('MEM003', '회원3', '3333', 'Y');
+INSERT INTO MEMBERS_TBL VALUES('MEM004', '회원4', '4444', 'Y');
+INSERT INTO MEMBERS_TBL VALUES('MEM005', '회원5', '5555', 'Y');
+INSERT INTO MEMBERS_TBL VALUES('MEM006', '회원6', '9999', 'Y');
+
+-- 2. 커뮤너티 
+CREATE TABLE COMMUNITY_TBL
+(
+	COM_ID	CHAR(6)	 PRIMARY KEY,
+    MEM_ID	CHAR(6)	 NOT NULL,
+    COM_NAME VARCHAR(50)	NOT NULL,
+    USE_YN	CHAR(1)		NOT NULL
+);
+
+INSERT INTO COMMUNITY_TBL VALUES('COM001', 'MEM001', '우리들의 이야기', 'Y'); 
+INSERT INTO COMMUNITY_TBL VALUES('COM002', 'MEM002', 'IT 어려워요', 'Y'); 
+INSERT INTO COMMUNITY_TBL VALUES('COM003', 'MEM003', '생활속의 아이디어', 'Y'); 
+INSERT INTO COMMUNITY_TBL VALUES('COM004', 'MEM005', '정치이야기', 'Y'); 
+INSERT INTO COMMUNITY_TBL VALUES('COM005', 'MEM004', '나는 정우성이 너무 좋아요', 'Y'); 
+INSERT INTO COMMUNITY_TBL VALUES('COM006', 'MEM006', '페미니스트를 위한....', 'Y'); 
+
+-- 3. 각 커뮤너티 대 메뉴
+CREATE TABLE MENUS
+(
+	MENU_ID	CHAR(7)	NOT NULL,
+    COM_ID	CHAR(6)	NOT NULL,
+    MENU_NAME	VARCHAR(30)	NOT NULL,
+    MENU_LVL	INT NOT NULL,
+   PRIMARY KEY(MENU_ID, COM_ID) 
+);
+
+INSERT INTO MENUS VALUES('MENU001', 'COM001', '즐거운이야기', 0);
+INSERT INTO MENUS VALUES('MENU002', 'COM001', '공지사항', 1);
+INSERT INTO MENUS VALUES('MENU003', 'COM001', '사랑스런 ....', 2);
+INSERT INTO MENUS VALUES('MENU004', 'COM001', '가고 싶은 여행지', 3);
+
+INSERT INTO MENUS VALUES('MENU001', 'COM002', 'HTML', 0);
+INSERT INTO MENUS VALUES('MENU002', 'COM002', 'JAVASCRIPT', 1);
+INSERT INTO MENUS VALUES('MENU003', 'COM002', 'DATABASE', 2);
+INSERT INTO MENUS VALUES('MENU004', 'COM002', 'JAVA', 3);
+INSERT INTO MENUS VALUES('MENU005', 'COM002', 'C#', 4);
+
+INSERT INTO MENUS VALUES('MENU001', 'COM003', '공지사항', 0);
+INSERT INTO MENUS VALUES('MENU002', 'COM003', '특허관련', 1);
+INSERT INTO MENUS VALUES('MENU003', 'COM003', '유용한 생활팁', 2);
+
+INSERT INTO MENUS VALUES('MENU001', 'COM004', '연예계소식', 0);
+INSERT INTO MENUS VALUES('MENU002', 'COM004', '우성이 오빠 화이팅', 1);
+
+INSERT INTO MENUS VALUES('MENU001', 'COM005', '보수, 진보....', 0);
+INSERT INTO MENUS VALUES('MENU002', 'COM005', '문재인 오빠', 1);
+INSERT INTO MENUS VALUES('MENU003', 'COM005', '제안해요', 2);
+
+-- 4.각 대메뉴에 대한 소메뉴
+CREATE TABLE TREE_MENUS
+(
+	TMENU_ID	CHAR(8)	NOT NULL,
+    MENU_ID		CHAR(7)	NOT NULL,
+	COM_ID		CHAR(6)	NOT NULL,
+    TMENU_NAME	VARCHAR(30)	NOT NULL,
+    TMENU_LVL	int		NOT NULL,
+    PRIMARY KEY(TMENU_ID, MENU_ID, COM_ID)
+);
+
+INSERT INTO TREE_MENUS VALUES('TMENU001', 'MENU001', 'COM001', '즐거워요1', 0);
+INSERT INTO TREE_MENUS VALUES('TMENU002', 'MENU001', 'COM001','즐거워요2', 1);
+
+INSERT INTO TREE_MENUS VALUES('TMENU001', 'MENU002', 'COM001','공지', 0);
+
+INSERT INTO TREE_MENUS VALUES('TMENU001', 'MENU003', 'COM001','사랑스런 가족', 0);
+INSERT INTO TREE_MENUS VALUES('TMENU002', 'MENU003', 'COM001','좋아하는 음식', 1);
+
+INSERT INTO TREE_MENUS VALUES('TMENU001', 'MENU004', 'COM001','추천 여행지', 0);
+
+
+INSERT INTO TREE_MENUS VALUES('TMENU001', 'MENU001', 'COM002', 'HTML', 0);
+
+INSERT INTO TREE_MENUS VALUES('TMENU001', 'MENU002', 'COM002', 'JAVASCRIPT', 0);
+INSERT INTO TREE_MENUS VALUES('TMENU002', 'MENU002', 'COM002', 'JQUERY', 1);
+
+INSERT INTO TREE_MENUS VALUES('TMENU001', 'MENU003', 'COM002', 'MYSQL', 0);
+INSERT INTO TREE_MENUS VALUES('TMENU002', 'MENU003', 'COM002', 'ORACLE', 1);
+
+INSERT INTO TREE_MENUS VALUES('TMENU001', 'MENU001', 'COM003', '공지사항', 0);
+
+INSERT INTO TREE_MENUS VALUES('TMENU002', 'MENU002', 'COM003', '특허관련정보', 0);
+
+INSERT INTO TREE_MENUS VALUES('TMENU003', 'MENU003', 'COM003', '생활팁', 0); 
+
+INSERT INTO TREE_MENUS VALUES('TMENU001', 'MENU001', 'COM004', '가요계', 0);
+INSERT INTO TREE_MENUS VALUES('TMENU002', 'MENU001', 'COM004', '영화계', 1);
+INSERT INTO TREE_MENUS VALUES('TMENU003', 'MENU001', 'COM004', '기타', 2);
+
+INSERT INTO TREE_MENUS VALUES('TMENU001', 'MENU002', 'COM004', '사진첩', 0);
+INSERT INTO TREE_MENUS VALUES('TMENU002', 'MENU002', 'COM004', '힘내요 우성오빠', 1);
+INSERT INTO TREE_MENUS VALUES('TMENU003', 'MENU002', 'COM004', '자유게시판', 2);
+INSERT INTO TREE_MENUS VALUES('TMENU004', 'MENU002', 'COM004', '기타', 3);
+
+
+
+#1. 회원이 로그인 할 수 있도록 아이디와 패스워드를 받아서 비교하는 프로시져를 만들어 주세요 (5점)
+
+#2. '회원2'가 만든 커뮤너티 이름을 찾아주세요 (5점)
+
+#3. '생활팀'이라는 메뉴이름을 만든 회원의 아이디와 이름을 찾아주세요 (5점)
+
+#4. 각 회원들이 만들 주메뉴 개수를 회원별로 보여주세요 (10점)
+
+#5. 특정 회원이 주메뉴를 새롭게 만드는 프로시져를 만들어 주세요 (5점)
+
+#6. 특정 회원이 하위메뉴를 새롭게 만드는 프로시져를 만들어 주세요 (5점)
+
+#7. 특정 회원이 주메뉴를 삭제하는 프로시져를 만들어 주세요 (5점)
+
+#8. 회원별 주메뉴를 보여주는 쿼리를 작성해 주세요 (5점)
+
+#9. 회원아이디, 주메뉴아이디를 받아서 하위메뉴를 보여주는 프로시져를 만들어 주세요 (5점)
+
+#10. 새로운 회원을 등록하는 프로시져를 만들어 주세요 단 새로운 회원이 만들어지면 커뮤너티가 자동으로 만들어지도록 프로시져를 만들어주세요 (5점)
+
+#11. 10번 문제를 MEMBERS 테이블에 AFTER INSERT TRRIGER를 이용하여 만들어 주세요 (5점)
+
+#12. 위의 4개 테이블에는 모두 아이디를 사용하고 있습니다. 특히 회원 아이디를 만들어주는 FUNCTION을 만들어 주세요 (5점)
+
+#13. 회원이 탈퇴하면 USE_YN값을 'N'으로 바꿉니다. 그렇게 되면 해당 회원의 커뮤너티도 사용할 수 없게 하는 프로시져를 만들어 주세요 (5점)
+
+#14. 회원이 자신의 패스워드를 바꾸는 프롯시져를 만들어 주세요 (5점)
+
+#15. 회원이 자신의 커뮤너티의 주메뉴를 삭제하면 해당 하위메뉴도 삭제할수 있는 프로시져를 만들어 주세요 (5점)
+
+#16. 회원테이블의 아이디를 수정하려하면 수정이 불가능하다는 메세지가 나오는 프로시져를 만들어주세요 (5점)
+
+#17. 회원중 커뮤너티 메뉴를 하나도 만들지 않은 회원들을 찾아주세요 (5점)
+
+#18. 해당 소메뉴 아이디를 입력하면 해당 메뉴를 만든 회원 이름을 찾는 프로시져를 만들어 주세요 (10점)
+
+
+
+
