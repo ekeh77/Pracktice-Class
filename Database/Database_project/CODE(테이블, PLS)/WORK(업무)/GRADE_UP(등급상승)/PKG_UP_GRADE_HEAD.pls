@@ -1,0 +1,8 @@
+create or replace NONEDITIONABLE PACKAGE PKG_UP_GRADE AS 
+   
+PROCEDURE PROC_UP_GRADE
+(
+    IN_CT_ID                VARCHAR2
+);
+
+END PKG_UP_GRADE;
