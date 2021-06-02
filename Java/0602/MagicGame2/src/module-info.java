@@ -1,0 +1,2 @@
+module MagicGame2 {
+}
