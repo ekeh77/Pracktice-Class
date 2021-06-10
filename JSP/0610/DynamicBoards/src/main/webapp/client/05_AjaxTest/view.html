@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+<style>
+	.row{
+		width:700px;
+		clear:both;
+	}
+	.row span{
+		width:100px;
+		height:30px;
+		display:block;
+		font-size:23px;
+		color:#777;
+		border:1px solid #ccc;
+		border-width:0px 0px 1px 0px;
+		padding:7px 0px 0px 0px;
+		float:left;
+		text-align:center;
+	}
+</style>
+<script>
+	var httpRequest = null;
+	
+	function getHttpRequest(){
+		
+		//내장객체
+		httpRequest = new XMLHttpRequest();
+		
+	}
+
+	function getList(){
+		
+		getHttpRequest();
+		
+		//server에 있는 list.jsp를 호출
+		httpRequest.onreadystatechange = callback;
+		httpRequest.open("GET","./list.jsp",true);
+		httpRequest.send(null);
+		
+	}
+	
+	function callback()
+	{ 
+		//서버로부터 응답이 왔으므로 알맞은 작업을 수행 
+		if (httpRequest.readyState == 4) 
+		{ 
+			if (httpRequest.status == 200) 
+			{ 
+				//alert(httpRequest.responseText)
+				var datas = httpRequest.responseXML;
+				setList(datas);
+			} 
+			else { alert("실패: "+httpRequest.status); } 
+		}
+
+	}
+	
+	function setList(datas){
+		
+		var boards = datas.getElementsByTagName("row");
+		
+		var strHTML = "";
+		
+		for(var i=0; i<boards.length; i++){
+			var bnum = boards[i].childNodes[0].childNodes[0].nodeValue; //bnum
+			var title = boards[i].childNodes[1].childNodes[0].nodeValue; //title
+			var regdate = boards[i].childNodes[2].childNodes[0].nodeValue; //regdate
+			
+			strHTML += "<span style='width:100px;'>" + bnum + "</span>"
+			strHTML += "<span style='width:400px;'>" + title + "</span>"
+			strHTML += "<span style='width:200px;'>" + regdate + "</span>"
+			
+			
+		}
+		console.log(strHTML);
+		document.getElementById("list").innerHTML = strHTML;
+		
+	}
+	
+</script>
+</head>
+<body>
+	<div>
+		<input type="button" value="리스트가져오기" onclick="getList()"/>
+	</div>
+	<div class="row">
+		<span style="width:100px;">글번호</span>
+		<span style="width:400px;">글제목</span>
+		<span style="width:200px;">작성일</span>
+	</div>
+	<div class="row" id=list>
+	<!-- 
+		<span style="width:100px;"></span>
+		<span style="width:400px;"></span>
+		<span style="width:100px;"></span>
+	 -->
+	</div>
+</body>
+</html>
