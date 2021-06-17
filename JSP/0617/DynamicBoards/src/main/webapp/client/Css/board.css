@@ -1,0 +1,40 @@
+@charset "UTF-8";
+
+	#menus{
+		width:1200px;
+		clear:both;
+	}
+	
+	#menus span{
+		display:block;
+		width:120px;
+		border:1px solid #888888;
+		float:left;
+		padding:8px 0px 8px 0px;
+		text-align:center;
+	}
+	
+	#boards{
+		width:1200px;
+		height:600px;
+		border:1px solid #999999;
+		padding:20px;
+		clear:both;
+	}
+	
+	#boards span{
+		display:block;
+		width:100px;
+		border:1px solid #888888;
+		float:left;
+		padding:6px 0px 6px 0px;
+		text-align:center;
+	}
+	
+	#bWrite{
+		width:1200px;
+		height:600px;
+		border:1px solid #999999;
+		padding:20px;
+		clear:both;
+	}
