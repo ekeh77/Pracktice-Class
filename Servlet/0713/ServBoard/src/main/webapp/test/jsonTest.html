@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="../js/jquery-3.6.0.min.js"></script>
+<script>
+	var test = function(){
+		var $newItem = "<span>new menu</span>";
+		$($newItem).insertBefore("#show span.span");
+		//$("#show").prepend($newItem);
+	}
+	
+</script>
+</head>
+<body>
+	<div id="show" style="font-size:40px;">
+		<span>1</span>
+		<span class="span">2</span>
+		<span>3</span>
+		<span>4</span>
+	</div>
+	<div>
+		<input type="button" value="확인" onclick="test();"/>
+	</div>
+</body>
+</html>
