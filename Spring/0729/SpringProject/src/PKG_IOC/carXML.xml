@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+ <!-- 
+   Car car = new Car();
+   car.setTire(new tire1());
+   
+   car.getTire();
+    -->
+    
+   <bean id="t1" class="PKG_IOC.T1" />                     <!--      Tire t1 = new T1();     -->
+   <bean id="t2" class="PKG_IOC.T2" />                     <!--      Tire t2 = new T2();     -->
+   <bean id="t3" class="PKG_IOC.T3" />                     <!--      Tire t3 = new T3();     -->
+    
+   <bean id="car" class="PKG_IOC.Car">                        <!--      Car car = new Car();       -->
+      <property name="tire" ref="t3"></property>               <!--      car.setTire(t1);         -->
+   </bean>
+
+</beans>
